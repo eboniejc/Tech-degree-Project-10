@@ -1,15 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Courses from './components/Courses';
-import CourseDetail from './components/CourseDetail';
-import UpdateCourse from './components/UpdateCourse';
-import Authenticated from './components/Authenticated';
-import UserSignIn from './components/UserSignIn';
-import UserSignUp from './components/UserSignUp';
-import UserSignOut from './components/UserSignOut';
-import CreateCourse from './components/CreateCourse';
-import PrivateRoute from './components/PrivateRoute';
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Header";
+import Courses from "./components/Courses";
+import CourseDetail from "./components/CourseDetail";
+import UpdateCourse from "./components/UpdateCourse";
+import Authenticated from "./components/Authenticated";
+import UserSignIn from "./components/UserSignIn";
+import UserSignUp from "./components/UserSignUp";
+import UserSignOut from "./components/UserSignOut";
+import CreateCourse from "./components/CreateCourse";
+import PrivateRoute from "./components/PrivateRoute";
+import NotFound from "./components/NotFound";
+import Forbidden from "./components/Forbidden";
+import UnhandledError from "./components/UnhandledError";
 
 const App = () => {
   return (
@@ -22,12 +24,17 @@ const App = () => {
         <Route path="signout" element={<UserSignOut />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/:id" element={<CourseDetail />} />
-        <Route path="/courses/:id/update" element={<UpdateCourse />} />
-        <Route path="/courses/create" element={<CreateCourse />} />
+        {/*Private */}
         <Route element={<PrivateRoute />}>
+          <Route path="/courses/create" element={<CreateCourse />} />
+          <Route path="/courses/:id/update" element={<UpdateCourse />} />
           <Route path="authenticated" element={<Authenticated />} />
-          </Route> 
-         {/* <Route path="*" element={<NotFound />} />  */}
+        </Route>
+
+        {/*Exceeds Exprectations */}
+        <Route path="*" element={<NotFound />} />
+        <Route path="/forbidden" element={<Forbidden />} />
+        <Route path="/error" element={<UnhandledError />} />
       </Routes>
     </Router>
   );

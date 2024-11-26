@@ -6,20 +6,29 @@ const Nav = () => {
   const { authUser } = useContext(UserContext);
   return (
     <nav>
-      {authUser === null ?
+      {authUser === null ? (
         <>
-          <Link className="signup" to="/signup">Sign up</Link>
-          <Link className="signin" to="/signin"> Sign in</Link>
+          <Link className="signup" to="/signup">
+            Sign up
+          </Link>
+          <Link className="signin" to="/signin">
+            {" "}
+            Sign in
+          </Link>
         </>
-        :
+      ) : (
         <>
-        <span>Welcome, {authUser.firstName} {authUser.lastName}!</span>
-          <Link className="signout" to="/signout"> Sign out</Link>
+          <span>
+            Welcome, {authUser.firstName} {authUser.lastName}!
+          </span>
+          <Link className="signout" to="/signout">
+            {" "}
+            Sign out
+          </Link>
         </>
-      }
-
+      )}
     </nav>
   );
-}
+};
 
 export default Nav;

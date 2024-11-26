@@ -10,7 +10,9 @@ const Authenticated = () => {
       <div className="bounds">
         <div className="grid-100">
           <h1>User not authenticated</h1>
-          <p>Please <Link to="/signin">sign in</Link> to view this page.</p>
+          <p>
+            Please <Link to="/signin">sign in</Link> to view this page.
+          </p>
         </div>
       </div>
     );
@@ -18,11 +20,13 @@ const Authenticated = () => {
   return (
     <div className="bounds">
       <div className="grid-100">
-        <h1>{authUser.firstName} {authUser.lastName} is Authenticated</h1>
+        <h1>
+          {authUser.firstName} {authUser.lastName} is Authenticated
+        </h1>
         <p>Your username is {authUser.emailAddress}</p>
       </div>
     </div>
   );
-}
+};
 
 export default Authenticated;

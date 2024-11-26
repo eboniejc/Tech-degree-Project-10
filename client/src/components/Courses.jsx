@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/courses') //Check api dont break it
+    fetch("http://localhost:5000/api/courses") //Check api dont break it
       .then((response) => response.json())
       .then((data) => setCourses(data))
-      .catch((error) => console.error('Error fetching courses:', error));
+      .catch((error) => console.error("Error fetching courses:", error));
   }, []);
-//use markup files
+  //use markup files
   return (
     <main>
       <div className="wrap main--grid">

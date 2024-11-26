@@ -1,11 +1,9 @@
-import { useContext, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../utils/apiHelper';
+import { useContext, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { api } from "../utils/apiHelper";
 
-import ErrorsDisplay from './ErrorsDisplay';
-import UserContext from '../context/UserContext';
-
-
+import ErrorsDisplay from "./ErrorsDisplay";
+import UserContext from "../context/UserContext";
 
 const UserSignUp = () => {
   const { actions } = useContext(UserContext);
@@ -27,12 +25,12 @@ const UserSignUp = () => {
       lastName: lastName.current.value,
       emailAddress: emailAddress.current.value,
       password: password.current.value,
-    }
+    };
 
     try {
       const response = await api("/users", "POST", user);
       if (response.status === 201) {
-        console.log(`Succesfully signed up and autheniticated`)
+        console.log(`Succesfully signed up and autheniticated`);
         await actions.signIn(user);
         navigate("/authenticated");
       } else if (response.status === 400) {
@@ -43,46 +41,74 @@ const UserSignUp = () => {
       }
     } catch (error) {
       console.log(error);
-      navigate("/error") // Navigate to error route
+      navigate("/error"); // Navigate to error route
     }
-
-  }
+  };
 
   const handleCancel = (event) => {
     event.preventDefault();
-    navigate("/")
-  }
+    navigate("/");
+  };
 
   return (
     <div className="form--centered">
       <h2>Sign Up</h2>
       {errors.length > 0 && (
-  <div>
-    <h2 className="validation--errors--label">Validation Errors</h2>
-    <ul className="validation-errors">
-      {errors.map((error, i) => (
-        <li key={i}>{error}</li>
-      ))}
-    </ul>
-  </div>
-)}
+        <div className="validation--errors">
+          <h3>Validation Errors</h3>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <label htmlFor="firstName">First Name</label>
-        <input id="firstName" name="firstName" type="text" ref={firstName} placeholder="First Name" />
+        <input
+          id="firstName"
+          name="firstName"
+          type="text"
+          ref={firstName}
+          placeholder="First Name"
+        />
         <label htmlFor="lastName">Last Name</label>
-        <input id="lastName" name="lastName" type="text" ref={lastName} placeholder="Last Name" />
+        <input
+          id="lastName"
+          name="lastName"
+          type="text"
+          ref={lastName}
+          placeholder="Last Name"
+        />
         <label htmlFor="emailAddress">Email Address</label>
-        <input id="emailAddress" name="emailAddress" type="email" ref={emailAddress} placeholder="Email Address" />
+        <input
+          id="emailAddress"
+          name="emailAddress"
+          type="email"
+          ref={emailAddress}
+          placeholder="Email Address"
+        />
         <label htmlFor="password">Password</label>
-        <input id="password" name="password" type="password" ref={password} placeholder="Password" />
-        <button className="button" type="submit">Sign Up</button>
-        <button className="button button-secondary" onClick={handleCancel}>Cancel</button>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          ref={password}
+          placeholder="Password"
+        />
+        <button className="button" type="submit">
+          Sign Up
+        </button>
+        <button className="button button-secondary" onClick={handleCancel}>
+          Cancel
+        </button>
       </form>
       <p>
-        Already have a user account? <Link to="/signin">Click here</Link> to sign in!
+        Already have a user account? <Link to="/signin">Click here</Link> to
+        sign in!
       </p>
     </div>
   );
-}
+};
 
 export default UserSignUp;
