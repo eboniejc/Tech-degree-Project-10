@@ -18,20 +18,30 @@ const UpdateCourse = () => {
 
   useEffect(() => {
     if (!authUser) {
-      navigate("/signin"); // Redirect to sign-in page if not authenticated
+      navigate("/signin"); // Redirect if not authenticated
+      return;
     }
-  }, [authUser, navigate]);
 
-  useEffect(() => {
-    fetch(`http://localhost:5000/api/courses/${id}`)
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parse the JSON
-        } else {
-          throw new Error("Course not found.");
+    const fetchCourse = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/courses/${id}`);
+
+        if (response.status === 404) {
+          navigate("/notfound"); // Redirect if course not found
+          return;
         }
-      })
-      .then((data) => {
+        if (response.status === 500) {
+          navigate("/error"); // Redirect on server error
+          return;
+        }
+        const data = await response.json();
+
+        // Redirect to `/forbidden` if the user isn’t the owner
+        if (authUser.id !== data.userId) {
+          navigate("/forbidden");
+          return;
+        }
+
         setCourse(data);
         //prefill form
         setFormData({
@@ -40,9 +50,15 @@ const UpdateCourse = () => {
           estimatedTime: data.estimatedTime || "",
           materialsNeeded: data.materialsNeeded || "",
         });
-      })
-      .catch((error) => setErrors([error.message]));
-  }, [id]);
+      } catch (error) {
+        console.error("Error fetching course:", error);
+        navigate("/error"); // Redirect on unexpected errors
+      }
+    };
+
+    fetchCourse();
+  }, [authUser, id, navigate]);
+   
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -52,7 +68,7 @@ const UpdateCourse = () => {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault(); //wont refresh page
 
     if (!authUser) {
@@ -62,35 +78,36 @@ const UpdateCourse = () => {
 
     const { emailAddress, password } = authUser;
 
-    console.log("Auth User:", authUser); // Log authUser for debugging
-    console.log(
-      "Authorization Header:",
-      `Basic ${btoa(`${emailAddress}:${password}`)}`,
-    ); // Check the encoded header
+
 
     //send put request
-    fetch(`http://localhost:5000/api/courses/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(`${emailAddress}:${password}`)}`, // Auth header
-      },
-      body: JSON.stringify(formData), // Request payload
-    })
-      .then((response) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/courses/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${btoa(`${emailAddress}:${password}`)}`, // Auth header
+        },
+        body: JSON.stringify(formData),
+      });
         if (response.ok) {
-          navigate(`/courses/${id}`);
-        } else if (response.status === 400) {
-          return response.json().then((data) => setErrors(data.errors));
-        } else if (response.status === 403) {
-          setErrors([
-            "Access Forbidden. You are not authorized to update this course.",
-          ]);
-        } else {
-          throw new Error("Update failed.");
-        }
-      })
-      .catch((error) => setErrors([error.message]));
+        navigate(`/courses/${id}`); // Redirect to course details
+      } else if (response.status === 400) {
+        const data = await response.json();
+        setErrors(data.errors);
+      } else if (response.status === 403) {
+        navigate("/forbidden"); // Redirect if unauthorized
+      } else if (response.status === 404) {
+        navigate("/notfound"); // Redirect if course not found
+      } else if (response.status === 500) {
+        navigate("/error"); // Redirect on server error
+      } else {
+        throw new Error("Update failed.");
+      }
+    } catch (error) {
+      console.error("Error updating course:", error);
+      navigate("/error"); // Redirect on unexpected errors
+    }
   };
 
   const handleCancel = (event) => {

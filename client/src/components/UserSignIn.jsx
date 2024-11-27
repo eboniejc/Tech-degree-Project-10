@@ -1,7 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import UserContext from "../context/UserContext";
-import ErrorsDisplay from "./ErrorsDisplay";
 
 const UserSignIn = () => {
   const { actions } = useContext(UserContext);
@@ -20,7 +19,7 @@ const UserSignIn = () => {
     const from = location.state?.from || "/";
 
     const credentials = {
-      username: username.current.value,
+      emailAddress: username.current.value, 
       password: password.current.value,
     };
 

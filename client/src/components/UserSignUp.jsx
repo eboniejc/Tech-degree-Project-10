@@ -2,7 +2,6 @@ import { useContext, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../utils/apiHelper";
 
-import ErrorsDisplay from "./ErrorsDisplay";
 import UserContext from "../context/UserContext";
 
 const UserSignUp = () => {
@@ -31,8 +30,14 @@ const UserSignUp = () => {
       const response = await api("/users", "POST", user);
       if (response.status === 201) {
         console.log(`Succesfully signed up and autheniticated`);
-        await actions.signIn(user);
-        navigate("/authenticated");
+        const signedInUser = await actions.signIn(user);
+
+      if (signedInUser) {
+        console.log("User successfully signed in:", signedInUser);
+        navigate("/"); 
+      } else {
+        setErrors(["Sign-in failed after account created."]);
+      }
       } else if (response.status === 400) {
         const data = await response.json();
         setErrors(data.errors);

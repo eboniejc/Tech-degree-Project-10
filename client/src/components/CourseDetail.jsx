@@ -1,35 +1,46 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
+import ReactMarkdown from "react-markdown";
 
 const CourseDetail = () => {
   const { id } = useParams(); //extract course ID
 
   const [course, setCourse] = useState(null); // For course data
-  const [error, setError] = useState(null); // For errors
+  const [error] = useState(null); // For errors
 
   const { authUser } = useContext(UserContext); //auth user
   const navigate = useNavigate(); //redirection
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/courses/${id}`)
-      .then((response) => {
-        if (response.ok) {
-          return response.json(); // Parse the JSON
-        } else {
-          throw new Error("Failed to fetch course details.");
+    const fetchCourse = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/courses/${id}`);
+
+        if (response.status === 404) {
+          navigate("/notfound"); // Redirect if course not found
+          return;
         }
-      })
-      .then((data) => setCourse(data)) // Save the data in state
-      .catch((err) => setError(err.message)); // Save error message in state
-  }, [id]); // Re-run  if `id` changes
+        if (response.status === 500) {
+          navigate("/error"); // Redirect on server error
+          return;
+        }
+        const data = await response.json();
+        setCourse(data);
+      } catch (error) {
+        console.error("Error fetching course:", error);
+        navigate("/error"); // Catch unexpected errors
+      }
+    };
+    fetchCourse();
+  }, [id, navigate]); // Re-run  if changes
 
   //step 14-review
   const handleDelete = async (event) => {
     event.preventDefault();
 
     if (!authUser) {
-      setErrors(["Authentication required. Please sign in and try again."]);
+      navigate("/signin");
       return;
     }
 
@@ -47,15 +58,18 @@ const CourseDetail = () => {
         // Successful
         navigate("/");
       } else if (response.status === 403) {
-        setErrors(["You do not have permission to delete this course."]);
+        navigate("/forbidden"); // Redirect if unauthorized
       } else if (response.status === 404) {
-        setErrors(["Course not found."]);
+        navigate("/notfound"); // Redirect if course not found
+      } else if (response.status === 500) {
+        navigate("/error"); // Redirect on server error
       } else {
         throw new Error("An unexpected error occurred.");
       }
     } catch (error) {
       console.error("Error:", error);
-      setErrors([error.message]);
+      navigate("/error"); // Redirect on unexpected errors
+
     }
   };
 
@@ -101,21 +115,17 @@ const CourseDetail = () => {
                 ? course.User.firstName + " " + course.User.lastName
                 : "Unknown"}
             </p>
-            <p>{course.description}</p>
+            <ReactMarkdown>{course.description}</ReactMarkdown>
           </div>
           <div>
             <h3 className="course--detail--title">Estimated Time</h3>
             <p>{course.estimatedTime || "N/A"}</p>
             <h3 className="course--detail--title">Materials Needed</h3>
-            <ul className="course--detail--list">
-              {course.materialsNeeded ? (
-                course.materialsNeeded
-                  .split("\n")
-                  .map((item, index) => <li key={index}>{item}</li>)
-              ) : (
-                <li>No materials listed.</li>
-              )}
-            </ul>
+            {course.materialsNeeded ? (
+              <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown>
+            ) : (
+              <p>No materials listed.</p>
+            )}
           </div>
         </div>
       </div>
