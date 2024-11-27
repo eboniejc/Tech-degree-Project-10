@@ -20,11 +20,13 @@ function asyncHandler(cb) {
   }
 }
 
+
 //Test remove
 (async () => {
   const courses = await Course.findAll();
   console.log("Courses in the database:", courses);
 })();
+
 
 
 // Get Authenticated user

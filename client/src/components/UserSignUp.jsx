@@ -41,6 +41,8 @@ const UserSignUp = () => {
       } else if (response.status === 400) {
         const data = await response.json();
         setErrors(data.errors);
+      } else if (response.status === 500) {
+        navigate("/error"); // Redirect on server error
       } else {
         throw new Error("Failed Sign-In");
       }

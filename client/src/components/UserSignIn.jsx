@@ -31,8 +31,11 @@ const UserSignIn = () => {
         setErrors(["Sign-in was unsuccessful"]);
       }
     } catch (error) {
-      console.log(error);
-      navigate("/error");
+      if (error.response && error.response.status === 500) {
+        navigate("/error"); //server error
+      } else {
+        navigate("/error"); // Catch unexpected errors
+      }
     }
   };
 

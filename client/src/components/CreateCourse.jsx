@@ -53,12 +53,15 @@ const CreateCourse = () => {
         // Handle validation errors
         const data = await response.json();
         setErrors(data.errors);
+      } else if (response.status === 500) {
+        navigate("/error"); // Redirect on server error
       } else {
         throw new Error("An unexpected error occurred.");
       }
     } catch (error) {
       console.error("Error:", error);
       setErrors([error.message]);
+      navigate("/error"); // Redirect on unexpected errors
     }
   };
 

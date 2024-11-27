@@ -1,15 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/courses") //Check api dont break it
-      .then((response) => response.json())
-      .then((data) => setCourses(data))
-      .catch((error) => console.error("Error fetching courses:", error));
-  }, []);
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/courses");
+
+        if (response.status === 500) {
+          navigate("/error"); // Redirect on server error
+          return;
+        }
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses.");
+        }
+
+        const data = await response.json();
+        setCourses(data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        navigate("/error"); // unexpected errors
+      }
+    };
+
+    fetchCourses();
+  }, [navigate]);
+
   //use markup files
   return (
     <main>
